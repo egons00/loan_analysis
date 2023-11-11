@@ -96,12 +96,29 @@ FROM (
 WHERE 1 = 1
 ;
 
+--1ST TASK
+--Loan performance analysis: Loan Overdue Rate
+SELECT
+a.*,
+(overdue_loans::decimal / all_loans) * 100 AS overdue_rate
+FROM (
+    SELECT COUNT(loan_id)                                                 AS all_loans
+         , COUNT(CASE WHEN days_overdue IS NOT NULL THEN 1 ELSE NULL END) AS overdue_loans
+         , COUNT(CASE WHEN days_overdue IS NULL THEN 1 ELSE NULL END)     AS non_overdue_loans
+    FROM loan_data
+) a
+;
+
+
+--2ND TASK
 --identify loans that are in overdue for more than 90 days
 SELECT *
 FROM loan_data
 WHERE 1=1
 AND days_overdue < -90
 
+
+--///////////
 --Summary on total count of customers with defaulted loans
 SELECT
 COUNT(DISTINCT customer_id) AS count_customers,
@@ -133,7 +150,7 @@ FROM loans
 GROUP BY 1,2,3,4
 HAVING loan_count > 1
 
---1 customer with 2 rejected loans
+--1. customer with 2 rejected loans (BOTH INVALID)
 SELECT customer_id
      , COUNT(DISTINCT loan_id) AS loans_c
 FROM loans
@@ -156,3 +173,6 @@ WHERE 1 = 1
 GROUP BY 1
 ORDER BY 2 DESC
 LIMIT 10
+
+
+
